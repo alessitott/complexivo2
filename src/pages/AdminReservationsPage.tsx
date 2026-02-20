@@ -122,6 +122,8 @@ export default function AdminReservationPage() {
             <Select label=" status" value={ status} onChange={(e) => setStatus(e.target.value)} sx={{ width: 220 }} >
                <MenuItem value="confirmado">Confirmado</MenuItem>
                 <MenuItem value="cancelado">Cancelado</MenuItem>
+                <MenuItem value="reservado">Reservado</MenuItem>
+   
             </Select>
 
             <Button variant="contained" onClick={save}>{editId ? "Actualizar" : "Crear"}</Button>

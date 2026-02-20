@@ -115,12 +115,11 @@ export default function AdminShowPage() {
               sx={{ width: 180 }}
             />
             <TextField
-              label="Asientos Disponibles"
-              type="number"
+              label="Asientos Disponibles" 
               value={availableSeats}
               onChange={(e) => setAvailableSeats(Number(e.target.value))}
               sx={{ width: 200 }}
-              inputProps={{ min: 0 }}
+        
             />
 
             <Button variant="contained" onClick={save}>{editId ? "Actualizar" : "Crear"}</Button>
