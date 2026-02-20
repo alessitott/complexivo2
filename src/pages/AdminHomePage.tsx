@@ -9,7 +9,7 @@ export default function AdminHomePage() {
 
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
           <Button variant="contained" component={Link} to="/admin/Shows">CRUD Shows</Button>
-          <Button variant="contained" component={Link} to="/admin/vehiculos">CRUD Vehículos</Button>
+          <Button variant="contained" component={Link} to="/admin/vehiculos">CRUD Rersvaciones</Button>
         </Stack>
       </Paper>
     </Container>

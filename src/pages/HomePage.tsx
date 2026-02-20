@@ -7,7 +7,7 @@ export default function HomePage() {
       <Paper sx={{ p: 3 }}>
         <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
           <DirectionsCarIcon />
-          <Typography variant="h5">Examen Frontend — Vehículos UI</Typography>
+          <Typography variant="h5">Examen Frontend — Cine UI</Typography>
         </Stack>
 
         <Typography variant="body1" sx={{ mb: 2 }}>
@@ -15,7 +15,7 @@ export default function HomePage() {
         </Typography>
 
         <Typography variant="body2" color="text.secondary">
-          Flujo: Lista (público) → Login → Admin (Panel) → CRUD Shows / Vehículos.
+          Flujo: Lista (público) → Login → Admin (Panel) → CRUD Shows / Reservaciones.
         </Typography>
       </Paper>
     </Container>

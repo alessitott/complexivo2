@@ -25,8 +25,8 @@ export async function createShowApi( payload: Omit<Show, "id">) {
   return data;
 }
 
-export async function updateShowApi( payload: Omit<Show, "id">) {
-    const { data } = await http.post<Show>("/api/shows/", payload);
+export async function updateShowApi(id: number, payload: Omit<Show, "id">) {
+    const { data } = await http.put<Show>(`/api/shows/${id}/`, payload);
     return data;
   }
 export async function deleteShowApi(id: number) {

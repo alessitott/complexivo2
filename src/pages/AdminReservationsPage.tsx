@@ -126,7 +126,7 @@ export default function AdminReservationPage() {
 
             <Button variant="contained" onClick={save}>{editId ? "Actualizar" : "Crear"}</Button>
             <Button variant="outlined" onClick={() => { setEditId(null); setCustomerName(""); setStatus(""); }}>Limpiar</Button>
-            <Button variant="outlined" onClick={() => { load(); loadShows(); }}>Refrescar</Button>R
+            <Button variant="outlined" onClick={() => { load(); loadShows(); }}>Refrescar</Button>
           </Stack>
         </Stack>
 

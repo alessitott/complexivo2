@@ -2,128 +2,130 @@ import { useEffect, useState } from "react";
 import {
   Container, Paper, Typography, TextField, Button, Stack,
   Table, TableHead, TableRow, TableCell, TableBody, IconButton, Alert,
-  FormControl, InputLabel, Select, MenuItem
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { type Show, listShowsApi } from "../api/shows.api";
-import { type Reservation, listReservationAdminApi, updateReservationApi, createReservationApi, deleteReservationApi } from "../api/reservations.api";
+import { type Show, listShowsApi, createShowApi, updateShowApi, deleteShowApi } from "../api/shows.api";
 
 export default function AdminShowPage() {
-  const [items, setItems] = useState<Reservation[]>([]);
-  const [Shows, setShows] = useState<Show[]>([]);
+  const [items, setItems] = useState<Show[]>([]);
   const [error, setError] = useState("");
 
   const [editId, setEditId] = useState<number | null>(null);
-  const [show, setShow] = useState<number>(0);
-  const [customerName, setCustomerName] = useState("");
-  const [seats, setSeats] = useState(0);
-  const [status, setStatus] = useState("");
-
+  const [movieTitle, setMovieTitle] = useState("");
+  const [room, setRoom] = useState("");
+  const [price, setPrice] = useState<number>(0);
+  const [availableSeats, setAvailableSeats] = useState<number>(0);
 
   const load = async () => {
     try {
       setError("");
-      const data = await listReservationAdminApi();
-      setItems(data.results); // DRF paginado
-    } catch {
-      setError("No se pudo cargar vehículos. ¿Login? ¿Token admin?");
-    }
-  };
-
-  const loadShows = async () => {
-    try {
       const data = await listShowsApi();
-      setShows(data.results); // DRF paginado
-      if (!show && data.results.length > 0) setShow(data.results[0].id);
+      setItems(data.results);
     } catch {
-      // si falla, no bloquea la pantalla
+      setError("No se pudo cargar shows. ¿Login? ¿Token admin?");
     }
   };
 
-  useEffect(() => { load(); loadShows(); }, []);
+  useEffect(() => { load(); }, []);
+
+  const resetForm = () => {
+    setEditId(null);
+    setMovieTitle("");
+    setRoom("");
+    setPrice(0);
+    setAvailableSeats(0);
+  };
 
   const save = async () => {
     try {
       setError("");
-      if (!show) return setError("Seleccione una show");
-      if (!customerName.trim() || ! status.trim()) return setError("customerName y  status son requeridos");
+      if (!movieTitle.trim()) return setError("El título de la película es requerido");
+      if (!room.trim()) return setError("La sala es requerida");
 
       const payload = {
-        show: Number(show),
-        customerName: customerName.trim(),
-        seats: Number(seats),
-        status:  status.trim(),
-
+        movie_title: movieTitle.trim(),
+        room: room.trim(),
+        price: Number(price),
+        available_seats: Number(availableSeats),
       };
 
-      if (editId) await updateReservationApi(editId, payload);
-      else await createReservationApi(payload as any);
+      if (editId) await updateShowApi(editId, payload);
+      else await createShowApi(payload);
 
-      setEditId(null);
-      setCustomerName("");
-      setStatus("");
+      resetForm();
       await load();
     } catch {
-      setError("No se pudo guardar vehículo. ¿Token admin?");
+      setError("No se pudo guardar show. ¿Token admin?");
     }
   };
 
-  const startEdit = (v: Reservation) => {
-    setEditId(v.id);
-    setShow(v.show_id);
-    setCustomerName(v.customer_name);
-    setSeats(v.seats);
-    setStatus(v.status);
+  const startEdit = (s: Show) => {
+    setEditId(s.id);
+    setMovieTitle(s.movie_title);
+    setRoom(s.room);
+    setPrice(s.price);
+    setAvailableSeats(s.available_seats);
   };
 
   const remove = async (id: number) => {
     try {
       setError("");
-      await deleteReservationApi(id);
+      await deleteShowApi(id);
       await load();
     } catch {
-      setError("No se pudo eliminar vehículo. ¿Token admin?");
+      setError("No se pudo eliminar show. ¿Token admin?");
     }
   };
 
   return (
     <Container sx={{ mt: 3 }}>
       <Paper sx={{ p: 3 }}>
-        <Typography variant="h5" sx={{ mb: 2 }}>Admin Vehículos (Privado)</Typography>
+        <Typography variant="h5" sx={{ mb: 2 }}>Admin Shows (Privado)</Typography>
 
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
         <Stack spacing={2} sx={{ mb: 2 }}>
           <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-
-            <FormControl sx={{ width: 260 }}>
-              <InputLabel id="show-label">show</InputLabel>
-              <Select
-                labelId="show-label"
-                label="show"
-                value={show}
-                onChange={(e) => setShow(Number(e.target.value))}
-              >
-                {Shows.map((m) => (
-                  <MenuItem key={m.id} value={m.id}>
-                    {m.movie_title} (#{m.id})
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <TextField label="customerName" value={customerName} onChange={(e) => setCustomerName(e.target.value)} fullWidth />
-            <TextField label="Año" type="number" value={seats} onChange={(e) => setSeats(Number(e.target.value))} sx={{ width: 160 }} />
+            <TextField
+              label="Título de Película"
+              value={movieTitle}
+              onChange={(e) => setMovieTitle(e.target.value)}
+              fullWidth
+              inputProps={{ maxLength: 120 }}
+            />
+            <TextField
+              label="Sala"
+              value={room}
+              onChange={(e) => setRoom(e.target.value)}
+              sx={{ width: 200 }}
+              inputProps={{ maxLength: 20 }}
+            />
           </Stack>
 
           <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-            <TextField label=" status" value={ status} onChange={(e) => setStatus(e.target.value)} sx={{ width: 220 }} />
+            <TextField
+              label="Precio"
+              value={price}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (/^\d*\.?\d{0,2}$/.test(val) || val === "") setPrice(val as any);
+              }}
+              sx={{ width: 180 }}
+            />
+            <TextField
+              label="Asientos Disponibles"
+              type="number"
+              value={availableSeats}
+              onChange={(e) => setAvailableSeats(Number(e.target.value))}
+              sx={{ width: 200 }}
+              inputProps={{ min: 0 }}
+            />
 
             <Button variant="contained" onClick={save}>{editId ? "Actualizar" : "Crear"}</Button>
-            <Button variant="outlined" onClick={() => { setEditId(null); setCustomerName(""); setStatus(""); }}>Limpiar</Button>
-            <Button variant="outlined" onClick={() => { load(); loadShows(); }}>Refrescar</Button>
+            <Button variant="outlined" onClick={resetForm}>Limpiar</Button>
+            <Button variant="outlined" onClick={load}>Refrescar</Button>
           </Stack>
         </Stack>
 
@@ -131,25 +133,24 @@ export default function AdminShowPage() {
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
-              <TableCell>show</TableCell>
-              <TableCell>customerName</TableCell>
-              <TableCell>Año</TableCell>
-              <TableCell> status</TableCell>
-              <TableCell>Color</TableCell>
+              <TableCell>Título Película</TableCell>
+              <TableCell>Sala</TableCell>
+              <TableCell>Precio</TableCell>
+              <TableCell>Asientos Disponibles</TableCell>
               <TableCell align="right">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {items.map((v) => (
-              <TableRow key={v.id}>
-                <TableCell>{v.id}</TableCell>
-                <TableCell>{v.showid_nombre ?? v.show_id}</TableCell>
-                <TableCell>{v.customer_name}</TableCell>
-                <TableCell>{v.seats}</TableCell>
-                <TableCell>{v. status}</TableCell>
+            {items.map((s) => (
+              <TableRow key={s.id}>
+                <TableCell>{s.id}</TableCell>
+                <TableCell>{s.movie_title}</TableCell>
+                <TableCell>{s.room}</TableCell>
+                <TableCell>${s.price}</TableCell>
+                <TableCell>{s.available_seats}</TableCell>
                 <TableCell align="right">
-                  <IconButton onClick={() => startEdit(v)}><EditIcon /></IconButton>
-                  <IconButton onClick={() => remove(v.id)}><DeleteIcon /></IconButton>
+                  <IconButton onClick={() => startEdit(s)}><EditIcon /></IconButton>
+                  <IconButton onClick={() => remove(s.id)}><DeleteIcon /></IconButton>
                 </TableCell>
               </TableRow>
             ))}

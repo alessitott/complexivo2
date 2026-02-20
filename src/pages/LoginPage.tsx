@@ -6,8 +6,8 @@ import { loginApi } from "../api/auth.api";
 export default function LoginPage() {
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("admin");
+  const [username, setUsername] = useState("alessito");
+  const [password, setPassword] = useState("Alessito");
   const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const doLogin = async () => {
